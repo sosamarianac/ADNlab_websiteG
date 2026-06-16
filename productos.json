@@ -4,7 +4,10 @@
     "titulo": "Porta Difusor Bombé",
     "categoria": "Deco Hogar",
     "precio": 8500,
-    "imagenes": ["fotos/difusor-1.jpg", "fotos/difusor-2.jpg"],
+    "imagenes": [
+      "fotos/difusor-1.jpg",
+      "fotos/difusor-2.jpg"
+    ],
     "specs": "Material: PLA | Tiempo de impresión: 8h",
     "destacado": true
   },
@@ -13,8 +16,22 @@
     "titulo": "Chop de Cerveza Personalizado",
     "categoria": "Bazar",
     "precio": 12000,
-    "imagenes": ["fotos/chop-1.jpg"],
+    "imagenes": [
+      "fotos/chop-1.jpg"
+    ],
     "specs": "Material: PETG (Apto contacto externo) | Capacidad: 500ml",
     "destacado": true
+  },
+  {
+    "id": "1781589541342",
+    "titulo": "Calendario perpetuo personalizado ",
+    "categoria": "Deco Hogar",
+    "precio": 10500,
+    "specs": "PLA 12x12cm",
+    "video": null,
+    "imagenes": [
+      "fotos/1781589535860_1000090786.jpg",
+      "fotos/1781589538789_1000090805.jpg"
+    ]
   }
 ]
