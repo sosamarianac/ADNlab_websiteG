@@ -10,7 +10,6 @@
 
     <header>
         <div class="logo-container">
-            <!-- Aquí va el logo exacto que proporcionaste -->
             <img src="1000160046.png" alt="ADNlab Logo">
         </div>
         <nav>
@@ -20,50 +19,90 @@
 
     <main>
         <section class="catalogo" id="contenedor-productos">
-            <!-- Los productos se inyectarán aquí mediante JavaScript -->
+            <p id="mensaje-carga" style="text-align: center; width: 100%; font-family: 'Space Mono', monospace;">Imprimiendo catálogo en 3D... ⏳</p>
         </section>
     </main>
 
     <script>
-        // Lógica para leer el GitHub y mostrar los productos
+        // Tu número de WhatsApp de atención (Ej: Argentina +54 9...)
+        const NUMERO_WSP = "54911XXXXXXXX"; 
+
         async function cargarProductos() {
             try {
-                // Cuando esté en GitHub Pages, simplemente leerá el archivo de la misma carpeta
-                const respuesta = await fetch('productos.json');
+                // Añadimos un timestamp a la URL para evitar que el navegador guarde en caché un JSON viejo
+                const url = `productos.json?v=${new Date().getTime()}`;
+                const respuesta = await fetch(url);
+                
+                if (!respuesta.ok) throw new Error("No se encontró el archivo");
+                
                 const productos = await respuesta.json();
-                
                 const contenedor = document.getElementById('contenedor-productos');
+                contenedor.innerHTML = ""; // Limpiamos el mensaje de carga
                 
+                // Si el catálogo está vacío
+                if(productos.length === 0) {
+                    contenedor.innerHTML = "<p style='text-align:center;'>Aún no hay productos cargados.</p>";
+                    return;
+                }
+
+                // Generar cada producto
                 productos.forEach(prod => {
-                    // Creamos la tarjeta del producto
                     const tarjeta = document.createElement('div');
                     tarjeta.className = 'card-producto';
                     
-                    // Solo tomamos la primera imagen por ahora (luego armamos el carrusel)
-                    const imagenPrincipal = prod.imagenes[0] || 'placeholder.jpg';
-                    
-                    // Armamos el HTML interno usando tu esquema
+                    // 1. Lógica del Carrusel de Imágenes
+                    // Si no hay fotos, muestra un placeholder. Si hay, crea etiquetas <img> para todas.
+                    let htmlImagenes = '';
+                    if (!prod.imagenes || prod.imagenes.length === 0) {
+                        htmlImagenes = `<img src="https://via.placeholder.com/400x400.png?text=Sin+Imagen" alt="Placeholder">`;
+                    } else {
+                        const imagenesTags = prod.imagenes.map(ruta => `<img src="${ruta}" alt="${prod.titulo} - Foto ADNlab" loading="lazy">`).join('');
+                        htmlImagenes = `<div class="galeria-carrusel">${imagenesTags}</div>`;
+                    }
+
+                    // 2. Lógica del Video (Botón condicional)
+                    const htmlVideo = prod.video 
+                        ? `<a href="${prod.video}" target="_blank" class="btn-video">▶ Ver video del producto</a>` 
+                        : '';
+
+                    // 3. Mensaje de WhatsApp personalizado
+                    const mensajeWsp = encodeURIComponent(`¡Hola ADNlab! Me interesa el producto: ${prod.titulo} ($${prod.precio}). ¿Tienen stock?`);
+                    const linkWsp = `https://wa.me/${NUMERO_WSP}?text=${mensajeWsp}`;
+
+                    // 4. Armar la tarjeta
                     tarjeta.innerHTML = `
-                        <img src="${imagenPrincipal}" alt="${prod.titulo}">
-                        <span class="categoria">${prod.categoria}</span>
-                        <h3>${prod.titulo}</h3>
-                        <p class="specs">${prod.specs}</p>
-                        <p class="precio">$${prod.precio.toLocaleString('es-AR')}</p>
+                        ${htmlImagenes}
+                        ${htmlVideo}
+                        <div style="margin-top: 15px;">
+                            <span class="categoria">${prod.categoria}</span>
+                            <h3 style="margin: 8px 0;">${prod.titulo}</h3>
+                            <p class="specs">${prod.specs || 'Material estándar'}</p>
+                            <p class="precio">$${prod.precio.toLocaleString('es-AR')}</p>
+                        </div>
                         
                         <div class="acciones">
-                            <a href="https://wa.me/TUNUMERO?text=Hola, quiero el ${prod.titulo}" target="_blank" class="btn-wsp">WhatsApp</a>
-                            <button class="btn-mp">Mercado Pago</button>
-                            <button class="btn-cuotas">Ver Cuotas</button>
+                            <a href="${linkWsp}" target="_blank" class="btn-wsp">
+                                💬 Consultar / Comprar
+                            </a>
+                            
+                            <button class="btn-mp" onclick="alert('Funcionalidad en desarrollo. Por favor contáctanos por WhatsApp para el link de pago.')">
+                                💳 Mercado Pago
+                            </button>
+                            
+                            <button class="btn-cuotas" onclick="alert('Ofrecemos 3 y 6 cuotas fijas. Consultá los recargos vigentes.')">
+                                📊 Ver opciones de Cuotas
+                            </button>
                         </div>
                     `;
                     contenedor.appendChild(tarjeta);
                 });
             } catch (error) {
-                console.error("Error al cargar el catálogo:", error);
+                console.error("Error al cargar:", error);
+                document.getElementById('mensaje-carga').innerText = "Error al cargar el catálogo. Intenta refrescar la página.";
             }
         }
 
-        // Ejecutar al cargar la página
+        // Ejecutar al cargar
         cargarProductos();
     </script>
 </body>
