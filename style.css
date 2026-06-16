@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  /* Paleta ADNlab */
+  --azul-plano: #233f93;
+  --blanco-secundario: #ffffff;
+  --carbon: #2b2730;
+  --papel: #fafaf7;
+  
+  /* Colores de Botones */
+  --wsp-green: #25D366;
+  --mp-blue: #009EE3;
+  --cuotas-color: #ff7b00; /* Puedes cambiarlo */
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--papel);
+  color: var(--carbon);
+  margin: 0;
+  padding: 0;
+}
+
+/* Header y Logo */
+header {
+  background-color: var(--carbon);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid var(--azul-plano);
+}
+
+.logo-container img {
+  height: 60px; /* Ajustable según el 1000160046.png */
+}
+
+/* Tipografía Técnica (Space Mono) */
+.precio, .categoria, .specs {
+  font-family: 'Space Mono', monospace;
+}
+
+.precio {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--azul-plano);
+}
+
+.specs {
+  font-size: 0.8rem;
+  background-color: #e0e4f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Botones de Compra */
+.btn-wsp, .btn-mp, .btn-cuotas {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  text-align: center;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-wsp { background-color: var(--wsp-green); }
+.btn-mp { background-color: var(--mp-blue); }
+.btn-cuotas { background-color: var(--cuotas-color); }
+
+/* Grilla de Productos */
+.catalogo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.card-producto {
+  background: var(--blanco-secundario);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card-producto img {
+  width: 100%;
+  border-radius: 4px;
+}
+/* --- NUEVOS ESTILOS PARA EL INDEX --- */
+
+/* Carrusel de Imágenes nativo (Scroll Snap) */
+.galeria-carrusel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 10px;
+  padding-bottom: 10px;
+  scrollbar-width: thin; /* Para Firefox */
+}
+
+/* Ocultar barra de scroll en Chrome/Safari para un look más limpio */
+.galeria-carrusel::-webkit-scrollbar {
+  height: 6px;
+}
+.galeria-carrusel::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.galeria-carrusel img {
+  scroll-snap-align: start;
+  flex: 0 0 100%; /* Cada imagen ocupa el 100% del ancho de la tarjeta */
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Cuadrado perfecto para Instagram/Catálogo */
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Botón de Video */
+.btn-video {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--carbon);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* Ajustes a los botones de compra */
+.acciones {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-wsp, .btn-mp, .btn-cuotas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: opacity 0.2s;
+}
+
+.btn-wsp:hover, .btn-mp:hover, .btn-cuotas:hover {
+  opacity: 0.9;
+}
+
+.btn-wsp { background-color: var(--wsp-green); }
+.btn-mp { background-color: var(--mp-blue); }
+.btn-cuotas { background-color: var(--carbon); /* Usamos el carbón de tu logo para contraste */ color: var(--blanco-secundario); border: 1px solid #ddd; }
