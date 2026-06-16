@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADNlab | Panel de Control</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos específicos para el panel de administración */
+        .admin-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        @media(min-width: 768px) {
+            .admin-container { grid-template-columns: 1fr 2fr; }
+        }
+        .panel-box {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-top: 5px solid var(--azul-plano);
+            border-radius: 6px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .panel-box h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+            color: var(--carbon);
+            border-bottom: 2px solid var(--papel);
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+        .form-group input.tech-font {
+            font-family: 'Space Mono', monospace;
+        }
+        .btn-action {
+            background-color: var(--azul-plano);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.2s;
+        }
+        .btn-action:hover { background-color: #1a3070; }
+        .btn-secundario {
+            background-color: var(--carbon);
+            margin-top: 10px;
+        }
+        .btn-secundario:hover { background-color: #151317; }
+        
+        /* Lista de productos en administración */
+        .admin-prod-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .admin-prod-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+        .admin-prod-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .admin-prod-meta h4 { margin: 0; font-size: 1rem; }
+        .admin-prod-meta span { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--azul-plano); }
+        .btn-delete {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .status-log {
+            font-family: 'Space Mono', monospace;
+            background: #2b2730;
+            color: #25D366;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="1000160046.png" alt="ADNlab Logo">
+        </div>
+        <nav>
+            <h2 style="color: var(--blanco-secundario); margin: 0; font-size: 1.2rem;">Panel ADM de Catálogo</h2>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        
+        <div class="left-column">
+            <div class="panel-box" style="margin-bottom: 20px;">
+                <h2>1. Conexión con GitHub</h2>
+                <div class="form-group">
+                    <label>Usuario de GitHub</label>
+                    <input type="text" id="git-user" placeholder="ej: tu-usuario">
+                </div>
+                <div class="form-group">
+                    <label>Nombre del Repositorio</label>
+                    <input type="text" id="git-repo" placeholder="ej: adnlab-web">
+                </div>
+                <div class="form-group">
+                    <label>Rama (Branch)</label>
+                    <input type="text" id="git-branch" value="main">
+                </div>
+                <div class="form-group">
+                    <label>GitHub Personal Token (PAT)</label>
+                    <input type="password" id="git-token" placeholder="github_pat_...">
+                    <small style="color:#666; font-size:0.75rem;">Este token da permisos para actualizar tus productos. Se guarda solo en tu navegador.</small>
+                </div>
+                <button class="btn-action btn-secundario" onclick="guardarConfig()">Conectar y Cargar Datos</button>
+                <div class="status-log" id="log-consola">> Esperando conexión...</div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            
+            <div class="panel-box" style="margin-bottom: 20px;">
+                <h2>2. Agregar Nuevo Producto</h2>
+                <form id="form-producto" onsubmit="procesarProducto(event)">
+                    <div class="form-group">
+                        <label>Título del Producto</label>
+                        <input type="text" id="prod-titulo" required placeholder="ej: Porta Difusor Bombé">
+                    </div>
+                    <div class="grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <input type="text" id="prod-categoria" required placeholder="ej: Deco Hogar">
+                        </div>
+                        <div class="form-group">
+                            <label>Precio ($)</label>
+                            <input type="number" id="prod-precio" class="tech-font" required placeholder="8500">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Especificaciones Técnicas (Specs)</label>
+                        <input type="text" id="prod-specs" placeholder="ej: Material: PLA | Altura: 15cm">
+                    </div>
+                    <div class="form-group">
+                        <label>Video promocional (URL opcional de YouTube/TikTok)</label>
+                        <input type="url" id="prod-video" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Fotos del Producto (Puedes seleccionar múltiples para el carrusel)</label>
+                        <input type="file" id="prod-fotos" accept="image/*" multiple required>
+                    </div>
+                    <button type="submit" class="btn-action" id="btn-guardar">Subir Producto al Catálogo</button>
+                </form>
+            </div>
+
+            <div class="panel-box">
+                <h2>3. Productos en Línea</h2>
+                <div id="lista-productos-admin">
+                    </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // Cargar configuración inicial si existe
+        document.getElementById('git-user').value = localStorage.getItem('adn_git_user') || '';
+        document.getElementById('git-repo').value = localStorage.getItem('adn_git_repo') || '';
+        document.getElementById('git-branch').value = localStorage.getItem('adn_git_branch') || 'main';
+        document.getElementById('git-token').value = localStorage.getItem('adn_git_token') || '';
+
+        let cacheProductos = [];
+        let archivoSHA = ""; // Requerido por la API de GitHub para actualizar
+
+        function logger(texto) {
+            const consola = document.getElementById('log-consola');
+            consola.innerText += "\n> " + texto;
+            consola.scrollTop = consola.scrollHeight;
+        }
+
+        function guardarConfig() {
+            localStorage.setItem('adn_git_user', document.getElementById('git-user').value);
+            localStorage.setItem('adn_git_repo', document.getElementById('git-repo').value);
+            localStorage.setItem('adn_git_branch', document.getElementById('git-branch').value);
+            localStorage.setItem('adn_git_token', document.getElementById('git-token').value);
+            logger("Configuración guardada localmente.");
+            obtenerCatalogoGitHub();
+        }
+
+        // Obtener el JSON actual desde la API de GitHub para saber su SHA y contenido
+        async function obtenerCatalogoGitHub() {
+            const user = document.getElementById('git-user').value;
+            const repo = document.getElementById('git-repo').value;
+            const branch = document.getElementById('git-branch').value;
+            const token = document.getElementById('git-token').value;
+
+            if(!user || !repo || !token) {
+                logger("Error: Faltan credenciales de GitHub.");
+                return;
+            }
+
+            logger("Conectando con GitHub API...");
+            const url = `https://api.github.com/repos/${user}/${repo}/contents/productos.json?ref=${branch}`;
+
+            try {
+                const res = await fetch(url, {
+                    headers: { "Authorization": `token ${token}` }
+                });
+
+                if(res.status === 404) {
+                    logger("Archivo productos.json no encontrado. Se creará uno nuevo al guardar.");
+                    cacheProductos = [];
+                    archivoSHA = "";
+                    renderListaAdmin();
+                    return;
+                }
+
+                const data = await res.json();
+                archivoSHA = data.sha;
+                // Decodificar Base64 de GitHub
+                const contenidoString = decodeURIComponent(atob(data.content).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                
+                cacheProductos = JSON.parse(contenidoString);
+                logger(`Catálogo cargado con éxito. (${cacheProductos.length} productos)`);
+                renderListaAdmin();
+
+            } catch (err) {
+                logger("Error al mapear el repositorio: " + err.message);
+            }
+        }
+
+        function renderListaAdmin() {
+            const contenedor = document.getElementById('lista-productos-admin');
+            contenedor.innerHTML = "";
+            
+            if(cacheProductos.length === 0) {
+                contenedor.innerHTML = "<p style='color:#999; text-align:center;'>No hay productos en el catálogo.</p>";
+                return;
+            }
+
+            cacheProductos.forEach((prod, index) => {
+                const item = document.createElement('div');
+                item.className = 'admin-prod-item';
+                item.innerHTML = `
+                    <div class="admin-prod-info">
+                        <img src="${prod.imagenes[0] || 'placeholder.jpg'}" alt="">
+                        <div class="admin-prod-meta">
+                            <h4>${prod.titulo}</h4>
+                            <span>$${prod.precio.toLocaleString('es-AR')}</span>
+                        </div>
+                    </div>
+                    <button class="btn-delete" onclick="eliminarProducto(${index})">Eliminar</button>
+                `;
+                contenedor.appendChild(item);
+            });
+        }
+
+        // Convertir archivo a Base64 para mandarlo a GitHub
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+
+        // Subir fotos a la carpeta /fotos en GitHub
+        async function subirImagenAGitHub(file) {
+            const user = document.getElementById('git-user').value;
+            const repo = document.getElementById('git-repo').value;
+            const token = document.getElementById('git-token').value;
+            
+            // Reemplazar espacios para evitar URLs rotas
+            const nombreLimpio = Date.now() + "_" + file.name.replace(/\s+/g, '-');
+            const path = `fotos/${nombreLimpio}`;
+            const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+
+            logger(`Subiendo imagen: ${file.name}...`);
+            const base64Content = await toBase64(file);
+
+            const bodyData = {
+                message: `Upload foto: ${nombreLimpio} via ADM`,
+                content: base64Content
+            };
+
+            const res = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(bodyData)
+            });
+
+            if(!res.ok) throw new Error(`Error al subir imagen ${file.name}`);
+            
+            logger(`Imagen subida: ${path}`);
+            return path; // Retornamos la ruta local interna del repositorio
+        }
+
+        // Guardar el JSON actualizado en GitHub
+        async function actualizarJsonEnGitHub() {
+            const user = document.getElementById('git-user').value;
+            const repo = document.getElementById('git-repo').value;
+            const branch = document.getElementById('git-branch').value;
+            const token = document.getElementById('git-token').value;
+            
+            const url = `https://api.github.com/repos/${user}/${repo}/contents/productos.json`;
+            
+            logger("Sincronizando cambios con el repositorio GitHub...");
+            
+            // Convertir el JSON de productos a string y luego a Base64 de forma segura para UTF-8
+            const jsonString = JSON.stringify(cacheProductos, null, 2);
+            const base64Json = btoa(unescape(encodeURIComponent(jsonString)));
+
+            const bodyData = {
+                message: "Actualización de catálogo desde Panel ADM",
+                content: base64Json,
+                branch: branch
+            };
+
+            if (archivoSHA) {
+                bodyData.sha = archivoSHA;
+            }
+
+            const res = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(bodyData)
+            });
+
+            if(res.ok) {
+                const resData = await res.json();
+                archivoSHA = resData.content.sha; // Actualizamos nuestro SHA local
+                logger("¡Catálogo actualizado con éxito en GitHub Pages!");
+                renderListaAdmin();
+            } else {
+                logger("Error crítico al subir el JSON.");
+            }
+        }
+
+        async function procesarProducto(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-guardar');
+            btn.disabled = true;
+            btn.innerText = "Procesando subida...";
+
+            try {
+                const titulo = document.getElementById('prod-titulo').value;
+                const categoria = document.getElementById('prod-categoria').value;
+                const precio = parseFloat(document.getElementById('prod-precio').value);
+                const specs = document.getElementById('prod-specs').value;
+                const video = document.getElementById('prod-video').value;
+                const inputFotos = document.getElementById('prod-fotos').files;
+
+                const rutasImagenes = [];
+                for(let i=0; i<inputFotos.length; i++) {
+                    const ruta = await subirImagenAGitHub(inputFotos[i]);
+                    rutasImagenes.push(ruta);
+                }
+
+                const nuevoProducto = {
+                    id: Date.now().toString(),
+                    titulo,
+                    categoria,
+                    precio,
+                    specs,
+                    video: video || null,
+                    imagenes: rutasImagenes
+                };
+
+                cacheProductos.push(nuevoProducto);
+                await actualizarJsonEnGitHub();
+                
+                document.getElementById('form-producto').reset();
+                logger(`Producto "${titulo}" agregado.`);
+
+            } catch (err) {
+                logger("Error en el proceso: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Subir Producto al Catálogo";
+            }
+        }
+
+        async function eliminarProducto(index) {
+            if(!confirm(`¿Estás seguro de eliminar "${cacheProductos[index].titulo}"?`)) return;
+            
+            logger(`Eliminando: ${cacheProductos[index].titulo}`);
+            cacheProductos.splice(index, 1);
+            
+            try {
+                await actualizarJsonEnGitHub();
+            } catch(err) {
+                logger("Error al eliminar: " + err.message);
+            }
+        }
+
+        // Ejecutar carga automática si ya tiene las credenciales configuradas
+        if(document.getElementById('git-token').value) {
+            setTimeout(obtenerCatalogoGitHub, 1000);
+        }
+    </script>
+</body>
+</html>
