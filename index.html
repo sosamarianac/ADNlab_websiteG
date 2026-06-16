@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADNlab | Impresión 3D</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <!-- Aquí va el logo exacto que proporcionaste -->
+            <img src="1000160046.png" alt="ADNlab Logo">
+        </div>
+        <nav>
+            <h2 style="color: var(--blanco-secundario); margin: 0;">Catálogo</h2>
+        </nav>
+    </header>
+
+    <main>
+        <section class="catalogo" id="contenedor-productos">
+            <!-- Los productos se inyectarán aquí mediante JavaScript -->
+        </section>
+    </main>
+
+    <script>
+        // Lógica para leer el GitHub y mostrar los productos
+        async function cargarProductos() {
+            try {
+                // Cuando esté en GitHub Pages, simplemente leerá el archivo de la misma carpeta
+                const respuesta = await fetch('productos.json');
+                const productos = await respuesta.json();
+                
+                const contenedor = document.getElementById('contenedor-productos');
+                
+                productos.forEach(prod => {
+                    // Creamos la tarjeta del producto
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = 'card-producto';
+                    
+                    // Solo tomamos la primera imagen por ahora (luego armamos el carrusel)
+                    const imagenPrincipal = prod.imagenes[0] || 'placeholder.jpg';
+                    
+                    // Armamos el HTML interno usando tu esquema
+                    tarjeta.innerHTML = `
+                        <img src="${imagenPrincipal}" alt="${prod.titulo}">
+                        <span class="categoria">${prod.categoria}</span>
+                        <h3>${prod.titulo}</h3>
+                        <p class="specs">${prod.specs}</p>
+                        <p class="precio">$${prod.precio.toLocaleString('es-AR')}</p>
+                        
+                        <div class="acciones">
+                            <a href="https://wa.me/TUNUMERO?text=Hola, quiero el ${prod.titulo}" target="_blank" class="btn-wsp">WhatsApp</a>
+                            <button class="btn-mp">Mercado Pago</button>
+                            <button class="btn-cuotas">Ver Cuotas</button>
+                        </div>
+                    `;
+                    contenedor.appendChild(tarjeta);
+                });
+            } catch (error) {
+                console.error("Error al cargar el catálogo:", error);
+            }
+        }
+
+        // Ejecutar al cargar la página
+        cargarProductos();
+    </script>
+</body>
+</html>
