@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "titulo": "Porta Difusor Bombé",
+    "categoria": "Deco Hogar",
+    "precio": 8500,
+    "imagenes": ["fotos/difusor-1.jpg", "fotos/difusor-2.jpg"],
+    "specs": "Material: PLA | Tiempo de impresión: 8h",
+    "destacado": true
+  },
+  {
+    "id": "2",
+    "titulo": "Chop de Cerveza Personalizado",
+    "categoria": "Bazar",
+    "precio": 12000,
+    "imagenes": ["fotos/chop-1.jpg"],
+    "specs": "Material: PETG (Apto contacto externo) | Capacidad: 500ml",
+    "destacado": true
+  }
+]
